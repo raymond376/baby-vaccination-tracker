@@ -55,15 +55,16 @@ if (process.env.NODE_ENV === "production") {
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/baby-vaccination";
 
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log("Connected to MongoDB");
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+// Start server first so Render detects the open port, then connect to MongoDB
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+
+  mongoose
+    .connect(MONGODB_URI)
+    .then(() => {
+      console.log("Connected to MongoDB");
+    })
+    .catch((err) => {
+      console.error("MongoDB connection error:", err.message);
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
-  });
+});
